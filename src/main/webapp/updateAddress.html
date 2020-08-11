@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改地址</title>
+</head>
+<body>
+<table border="1" cellspacing="0" cellpadding="0" align="center" width="600px">
+    <tr align="center">
+        <td>
+            修改地址
+        </td>
+    </tr>
+    <tr>
+        <td>
+            收货人:<input id="shipname">
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            联系方式:<input id="shipphone">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            省/直辖市:<input id="province">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            市:<input id="city">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            详细地址:<input id="addressdetail">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            邮箱:<input id="email">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input type="submit" onclick="Update()">
+            <input type="reset">
+        </td>
+    </tr>
+</table>
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<script>
+    var shipaddrid= window.location.search.split("=").pop();
+    function Update(){
+        if(shipaddrid==null){
+            $.ajax({
+                type: "Post",
+                //请求的媒体类型
+                contentType: "application/json;charset=UTF-8",
+                //返回数据格式
+                dataType: "json",
+                //请求地址
+                url: "http://localhost:8080/editAddress",
+                data:JSON.stringify({
+                    "shipname":$("#shipname").val(),
+                    "shipphone":$("#shipphone").val(),
+                    "province":$("#province").val(),
+                    "city":$("#city").val(),
+                    "addressdetail":$("#addressdetail").val(),
+                    "email":$("#email").val()
+                }),
+                //请求成功
+                success: function (result) {
+                    alert(result);
+                },
+                //请求失败，包含具体的错误信息
+                error: function (e) {
+                    console.log(e.status);
+                    console.log(e.responseText);
+                }
+            })
+        }else{
+            $.ajax({
+                type: "Post",
+                //请求的媒体类型
+                contentType: "application/json;charset=UTF-8",
+                //返回数据格式
+                dataType: "json",
+                //请求地址
+                url: "http://localhost:8080/updateAddressById",
+                data:JSON.stringify({
+                    "shipaddrid":shipaddrid,
+                    "shipname":$("#shipname").val(),
+                    "shipphone":$("#shipphone").val(),
+                    "province":$("#province").val(),
+                    "city":$("#city").val(),
+                    "addressdetail":$("#addressdetail").val(),
+                    "email":$("#email").val()
+                }),
+                //请求成功
+                success: function (result) {
+                    window.location.href="shipAddress.html";
+                },
+                //请求失败，包含具体的错误信息
+                error: function (e) {
+                    console.log(e.status);
+                    console.log(e.responseText);
+                }
+            })
+        }
+
+    }
+    function initPage(){
+
+        if(shipaddrid==null){
+            return;
+        }
+        $.ajax({
+            type: "Get",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //返回数据格式
+            dataType: "json",
+            //请求地址
+            url: "http://localhost:8080/getAddressById?shipaddrid="+shipaddrid,
+
+            //请求成功
+            success: function (result) {
+                    $("#shipname").val(result.shipname),
+                    $("#shipphone").val(result.shipphone),
+                    $("#province").val(result.province)
+                    $("#city").val(result.city),
+                    $("#addressdetail").val(result.addressdetail),
+                    $("#email").val(result.email)
+            },
+            //请求失败，包含具体的错误信息
+            error: function (e) {
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        })
+    }
+    initPage();
+</script>
+</body>
+</html>

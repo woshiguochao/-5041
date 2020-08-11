@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加地址</title>
+</head>
+<body>
+<form>
+    <table border="1" cellspacing="0" cellpadding="0" align="center" width="600px">
+        <tr align="center">
+            <td>
+                新增收货地址
+            </td>
+        </tr>
+        <tr>
+            <td>
+                收货人:<input id="shipname">
+            </td>
+        </tr>
+        <tr style="display:none">
+            <td>
+                userid:<input id="userid">
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                联系方式:<input id="shipphone">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                省/直辖市:<input id="province">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                市:<input id="city">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                详细地址:<input id="addressdetail">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                邮箱:<input id="email">
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <input type="submit" onclick="addAddressNew()">
+                <input type="reset">
+            </td>
+        </tr>
+    </table>
+</form>
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script>
+    // 判断用户是否登录
+    console.log("判断是否登录!");
+
+    $.ajax({
+        //请求方式GET/POST
+        //type: "Get",
+        //请求的媒体类型
+        //contentType: "application/json;charset=UTF-8",
+        //接受数据类型
+        //dataType: "json",
+        //请求地址
+        url: "http://localhost:8080//checkIfLogin",
+        success: function (result) {
+            console.log("success检测用户是否登录");
+            //var value = result;
+            //var sessionStorageUserid;
+            //console.log(result + "=====");
+            //判断是否有返回值!!!
+            //if (value != "" && value != null && value != undefined) {
+            if (result) {
+                $("#checkIfLogin").html("");
+                $(result).each(function (index, item) {
+                    var trStr = "<ul class=\"fl\">";
+                    trStr += "<li class=\"f-item\">品优购欢迎您！</li>";
+                    trStr += "<li class=\"f-item\">" + item.username + "</li>&ensp;&ensp;";
+                    trStr += "<li class=\"f-item\"><span><a onclick=\"logOut()\" target=\"_blank\">退出</a></span></li>";
+                    trStr += "</ul>";
+                    $("#checkIfLogin").append(trStr);
+                    console.log("用户已登陆");
+                    //console.log(item);
+                    sessionStorage.setItem("userid", item.userid);
+                    $("#userid").val(item.userid);
+                    console.log("userid:" + item.userid);
+                });
+            } else {
+                console.log("用户未登录");
+                //提示登录 跳转到登录页
+                var b = confirm("请先登录!");
+                if (b == true) {
+                    window.location.href = "login.html";
+                } else if (b == false) {
+                    //window.location.href = "product_details.html";
+                }
+            }
+
+            //}
+            // console.log("sessionStorageUserid:" + sessionStorageUserid);
+        },
+        error: function (e) {
+            console.log(e);
+            console.log(e.status);
+            console.log(e.responseText);
+        }
+    })
+
+</script>
+<script>
+    /**
+     * 增加新地址
+     */
+    function addAddressNew() {
+        $.ajax({
+            type: "Post",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //返回数据格式
+            dataType: "json",
+            //请求地址
+            url: "http://localhost:8080/editAddress",
+            data: JSON.stringify({
+                "userid": $("#userid").val(),
+                "shipname": $("#shipname").val(),
+                "shipphone": $("#shipphone").val(),
+                "province": $("#province").val(),
+                "city": $("#city").val(),
+                "addressdetail": $("#addressdetail").val(),
+                "email": $("#email").val()
+            }),
+            //请求成功
+            success: function (result) {
+                alert("添加成功!");
+                window.location.href = "shipAddress.html";
+            },
+            //请求失败，包含具体的错误信息
+            error: function (e) {
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qf.dao.OrderMapper">
+    <!--    查询个人所有订单-->
+    <select id="selectOrderByUserId" resultType="com.qf.vo.OrderVO" parameterType="int">
+   select o.orderid,o.paymoney,o.createtime,o.orderstatus,o.orderno,g.goodsid,g.goodscontent,g.goodspic,g.goodsprice,g.goodsname from `order`o,goods g ,cart c where o.cartid=c.cartid and c.goodsid=g.goodsid and o.userid=#{userid} and orderexist = '1' order by orderid ASC
+    </select>
+
+    <!--    查询待付款订单-->
+        <select id="selectUnpayOrder" parameterType="int" resultType="com.qf.vo.OrderVO">
+           select o.orderid,o.orderno,o.paymoney,o.createtime,o.orderstatus,g.goodscontent,g.goodspic,g.goodsprice,g.goodsname from `order`o,goods g,cart c where o.cartid = c.cartid and c.goodsid = g.goodsid and o.userid=#{userid} and orderstatus='0' and orderexist = '1' order by orderid ASC
+        </select>
+    <update id="deleteOrder" parameterType="int">
+        update `order` set orderexist =0 where orderid =#{orderid}
+    </update>
+    
+    <select id="selectBuyOrderInfo" parameterType="int" resultType="com.qf.vo.BuyOrderVO">
+        select g.goodspic,g.goodsname,g.goodscontent,g.goodsprice,g.goodsid,oi.goodscount,oi.sumprice,oi.orderno,oi.orderinfoid,oi.userid
+        from orderinfo oi,cart c,goods g
+        where oi.cartid =c.cartid and c.goodsid = g.goodsid and oi.userid=#{oi.userid} order by oi.orderinfoid DESC limit 1
+    </select>
+    <!--购物车结算插入信息-->
+    <insert id="addOrderFromCart2" parameterType="com.qf.pojo.Order">
+         insert into `order` (orderid,orderno,paymoney,cartid,userid,createtime) values
+    (default,#{orderno},#{paymoney},#{cartid},#{userid},current_time )
+    </insert>
+    
+</mapper>

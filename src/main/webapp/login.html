@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <title>品优购，欢迎登录</title>
+
+    <link rel="stylesheet" type="text/css" href="css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="css/pages-login.css"/>
+
+    <script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery.easing/jquery.easing.min.js"></script>
+    <script type="text/javascript" src="js/plugins/sui/sui.min.js"></script>
+    <script type="text/javascript" src="js/plugins/jquery-placeholder/jquery.placeholder.min.js"></script>
+    <script type="text/javascript" src="js/pages/login.js"></script>
+</head>
+
+<body>
+<div class="login-box">
+    <!--head-->
+    <div class="py-container logoArea">
+        <a href="" class="logo"></a>
+    </div>
+    <!--loginArea-->
+    <div class="loginArea">
+        <div class="py-container login">
+            <div class="loginform">
+                <ul class="sui-nav nav-tabs tab-wraped">
+                    <li>
+                        <a href="#index" data-toggle="tab">
+                            <h3>扫描登录</h3>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="#profile" data-toggle="tab">
+                            <h3>账户登录</h3>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content tab-wraped">
+                    <div id="index" class="tab-pane">
+                        <p>二维码登录，暂为官网二维码</p>
+                        <img src="img/wx_cz.jpg"/>
+                    </div>
+                    <div id="profile" class="tab-pane  active">
+                        <form class="sui-form" onsubmit="return false;">
+                            <div class="input-prepend"><span class="add-on loginname"></span>
+                                <input id="username" type="text"  class="span2 input-xfat">
+                            </div>
+                            <div class="input-prepend"><span class="add-on loginpwd"></span>
+                                <input id="userpass" type="password"  class="span2 input-xfat">
+                            </div>
+                            <div class="setting">
+                                <label class="checkbox inline">
+                                    <input id="autologin" type="checkbox">
+                                    自动登录
+                                </label>
+                                <span class="forget">忘记密码？</span>
+                            </div>
+                            <div class="logined">
+                                <button class="sui-btn btn-block btn-xlarge btn-danger" onclick="dologin()">登&nbsp;&nbsp;录</button>
+                            </div>
+                        </form>
+                        <div class="otherlogin">
+                            <div class="types">
+                                <ul>
+                                    <li><img src="img/qq.png" width="35px" height="35px"/></li>
+                                    <li><img src="img/sina.png"/></li>
+                                    <li><img src="img/ali.png"/></li>
+                                    <li><img src="img/weixin.png"/></li>
+                                </ul>
+                            </div>
+                            <span class="register"><a href="register.html" target="_blank">立即注册</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--foot-->
+    <div class="py-container copyright">
+        <ul>
+            <li>关于我们</li>
+            <li>联系我们</li>
+            <li>联系客服</li>
+            <li>商家入驻</li>
+            <li>营销中心</li>
+            <li>手机品优购</li>
+            <li>销售联盟</li>
+            <li>品优购社区</li>
+        </ul>
+
+    </div>
+</div>
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="script/docs.min.js"></script>
+<script type="text/javascript" src="js/model/cartModel.js"></script>
+<script type="text/javascript" src="js/plugins/jquery.easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="js/plugins/sui/sui.min.js"></script>
+<script type="text/javascript" src="js/plugins/jquery.jqzoom/jquery.jqzoom.js"></script>
+<script type="text/javascript" src="js/plugins/jquery.jqzoom/zoom.js"></script>
+<script>
+    function dologin() {
+
+        //1.获取用户名与密码
+        var username = $("#username").val();
+        var userpass = $("#userpass").val();
+        var al;
+        console.log(username + ":" + userpass);
+        //判断是否选中
+        if ($("#autologin").is(':checked')){
+            al = 1  // checked
+        } else {
+            al = 0 //unchecked
+        }
+        console.log(al);
+        $.ajax({
+            //请求方式GET/POST
+            type: "POST",
+            //请求的媒体类型
+            contentType: "application/json;charset=UTF-8",
+            //接受数据类型
+            dataType: "json",
+            //async: false,
+            //请求地址
+            async:true,
+            
+            data : JSON.stringify(
+                {
+                    "al":al,
+                    "username":username,
+                    "userpass":userpass
+                }
+            ),
+            url: "http://localhost:8080//loginCheck",
+            //数据，json字符串
+            //请求成功
+            success: function (result) {
+                console.log(result);
+                if(result){
+                    alert("登录成功");
+                    window.location.href="goodsList.html";
+                }else{
+                    alert("用户名或密码错误");
+                }
+
+            },
+            error: function (e) {
+                console.error(e);
+                console.log(e.status);
+                console.log(e.responseText);
+            }
+        });
+
+    }
+</script>
+</body>
+</html>

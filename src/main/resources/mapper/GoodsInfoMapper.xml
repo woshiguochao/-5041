@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qf.dao.GoodsInfoMapper">
+    <resultMap id="goodsInfoMap" type="com.qf.pojo.GoodsInfo">
+        <id property="goodsId" column="goodsId"></id>
+        <result property="goodsName" column="goodsName"></result>
+        <result property="goodsPrice" column="goodsPrice"></result>
+        <result property="goodsStock" column="goodsStock"></result>
+        <result property="goodsContent" column="goodsContent"></result>
+        <result property="goodsPic" column="goodsPic"></result>
+        <result property="goodsStatus" column="goodsStatus"></result>
+        <result property="goodsBrand" column="goodsBrand"></result>
+    </resultMap>
+    <!--展示主页商品-->
+    <select id="listAll" resultMap="goodsInfoMap">
+         select * from goods where goodsStatus = 2
+    </select>
+    <!--条件查询主页商品-->
+    <select id="searchGoods" resultType="com.qf.pojo.GoodsInfo" parameterType="com.qf.dto.GoodsInfoDTO">
+        select * from goods where goodsStatus = 1
+        <if test="goodsName != null and goodsName != ''">
+            and goodsName like "%"#{goodsName}"%"
+        </if>
+        <if test="goodsPrice1 !=null and goodsPrice1!='' and goodsPrice2 !=null and goodsPrice2!=''">
+            and goodsprice between #{goodsPrice1} and #{goodsPrice2}
+        </if>
+    </select>
+    <!--根据id下架商品-->
+    <update id="removeGoodsInfoById" parameterType="int">
+        update goods set goodsStatus = 0 where goodsId = #{id}
+    </update>
+    <!--根据id下架收藏夹商品-->
+    <update id="removeFavouriteGoods" parameterType="int">
+        update favourite set favouritestatus = 0 where goodsId = #{id}
+    </update>    
+    <!--根据id下架我的足迹商品-->
+    <delete id="removeRecordsGoods" parameterType="int">
+        delete from records where recordsid = #{id}
+    </delete>
+    <!--增加主页商品信息-->
+    <insert id="addGoodsInfo" parameterType="com.qf.pojo.GoodsInfo">
+        insert into goods(goodsName,
+        goodsPrice,
+        goodsStock,goodsContent,goodsPic,goodsStatus,goodsBrand)
+        values(#{goodsName},#{goodsPrice},#{goodsStock},#{goodsContent},#{goodsPic},#{goodsStatus},#{goodsBrand})
+    </insert>
+    <!--将商品添加到购物车-->
+    <insert id="addCart" parameterType="com.qf.vo.CartVO">
+        insert into cart(goodsid,quantity,cartStatus,createTime,userid) values(#{goodsid},1,1,current_time,#{userid})
+    </insert>
+    <!--通过商品id获取商品信息-->
+    <select id="getCartInfoById" resultType="com.qf.pojo.GoodsInfo">
+		select * from goods
+		where goodsId = #{id}
+	</select>
+    <!--遍历购物车商品是否已重复,如果重复取出goodsId进行比较-->
+    <select id="checkCart" resultType="int" parameterType="com.qf.dto.UserCartDTO">
+        select count(goodsId)from cart where goodsId = #{goodsid} and userid = #{userid} 
+    </select>    
+    <!--遍历收藏夹商品是否已重复,如果重复取出goodsId进行比较-->
+    <select id="checkFavourite" resultType="int" parameterType="com.qf.vo.FavouriteVO">
+        select count(goodsid)from favourite where goodsid = #{goodsid} and userid = #{userid}
+    </select>
+    <!--商品重复,数量+1,并且将商品上架-->
+    <update id="addCartQuantity" parameterType="com.qf.dto.UserCartDTO">
+        update cart set quantity = quantity + 1 , cartstatus = 1 where goodsid = #{goodsid} and userid = #{userid}
+    </update>    
+    <!--收藏夹商品重复将商品上架-->
+    <update id="putAwayFavourite" parameterType="com.qf.vo.FavouriteVO">
+        update favourite set favouritestatus = 1,createtime = current_time where goodsid = #{goodsid} and userid = #{userid}
+    </update>
+    <!--展示购物车所有商品-->
+    <select id="getCart" resultType="com.qf.vo.CartVO" parameterType="com.qf.vo.CartVO">
+		select c.*,g.goodsname,g.goodsprice,g.goodspic from cart c ,goods g where c.goodsid = g.goodsid and c.cartstatus = 1 and c.userid = #{userid}
+	</select>
+    <!--展示收藏夹所有商品-->
+    <select id="listAllFavourite" resultType="com.qf.vo.FavouriteVO" parameterType="com.qf.vo.FavouriteVO">
+        select f.*,g.goodsname,g.goodsprice,g.goodspic from favourite f,goods g where f.goodsid = g.goodsid and f.favouritestatus = 1 and f.userid = #{userid}
+    </select>
+    <!--展示我的足迹所有商品-->
+    <select id="listAllRecords" resultType="com.qf.vo.RecordsVO" parameterType="com.qf.vo.RecordsVO">
+        select r.*,g.goodsname,g.goodsprice,g.goodspic from records r,goods g where r.goodsid = g.goodsid and r.userid = #{userid}
+    </select>
+    <!--单个将商品移出购物车-->
+    <update id="removeGoodsFromCart" parameterType="com.qf.vo.CartVO">
+        update cart set cartstatus = 0,quantity = 0 where goodsid = #{goodsid} and userid = #{userid}
+    </update>
+    <!--批量删除购物车商品-->
+    <update id="allDel">
+        update cart set cartstatus = 0,quantity = 0 where cartid in
+        <foreach collection="array" open="(" separator="," close=")" item="id1">
+            #{id1}
+        </foreach>
+    </update>
+    <!--批量删除收藏夹商品-->
+    <update id="allFavoriteDel">
+        update favourite set favouritestatus = 0 where favouriteid in
+        <foreach collection="array" open="(" separator="," close=")" item="id1">
+            #{id1}
+        </foreach>
+    </update>    
+    <!--批量删除我的足迹商品-->
+    <delete id="allDelRecords">
+        delete from records where recordsid in
+        <foreach collection="array" open="(" separator="," close=")" item="id1">
+            #{id1}
+        </foreach>
+    </delete>
+    <!--商品详情页根据商品id获取商品信息-->
+    <select id="getGoodsInfoById" resultType="com.qf.pojo.GoodsInfo">
+        select * from goods where goodsId = #{id}
+    </select>
+    <!--获取商品类别-->
+    <select id="listAllTypes" resultType="com.qf.pojo.GoodsTypeInfo">
+        select * from goodstype
+    </select>
+    <!--下拉框类别更改商品-->
+    <select id="selectGoodsByType" parameterType="com.qf.pojo.GoodsTypeInfo" resultType="com.qf.pojo.GoodsInfo">
+        select g.* from goods g,goodstype gt where  g.goodstypeid = gt.typeid and gt.typename = #{typeName}
+    </select>
+    <!--将商品保存到我的足迹和收藏夹-->
+    <insert id="addToRecords" parameterType="com.qf.vo.RecordsVO">
+        insert into records (goodsid,createtime,userid) values (#{goodsid},current_time,#{userid})
+    </insert>
+    <insert id="addToMyFavourite" parameterType="com.qf.vo.FavouriteVO">
+        insert into favourite (goodsid,favouritestatus,createtime,userid) values (#{goodsid},1,current_time,#{userid})
+    </insert>
+
+</mapper>

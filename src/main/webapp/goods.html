@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>商品管理</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="plugins/adminLTE/css/AdminLTE.css">
+    <link rel="stylesheet" href="plugins/adminLTE/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="css/style.css">
+	<script src="plugins/jquery/jquery-2.2.3.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script src="js/layer/2.4/layer.js"></script>
+</head>
+
+<body class="hold-transition skin-red sidebar-mini" >
+  <!-- .box-body -->
+                
+                    <div class="box-header with-border">
+                        <h3 class="box-title">商品管理</h3>
+                    </div>
+
+                    <div class="box-body">
+
+                        <!-- 数据表格 -->
+                        <div class="table-box">
+
+                            <!--工具栏-->
+                            <div class="pull-left">
+                                <div class="form-group form-inline">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default" title="新建" onclick="addgoods()"><i class="fa fa-file-o"></i> 新建</button>
+                                        <button type="button" class="btn btn-default" title="删除" onclick="batchDel()"><i class="fa fa-trash-o"></i> 删除</button>
+                                        <button type="button" class="btn btn-default" title="提交审核" onclick="updatestatus()"><i class="fa fa-check"></i> 提交审核</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-tools pull-right">
+                                <div class="has-feedback">
+                                  状态：<select onchange="selectByType()" class="select" id="selOp">
+                                         	<option>全部</option>
+                                         	<option value="0">未审核</option>
+                                            <option value="1">正在申请</option>
+                                         	<option value="2">审核通过</option>
+                                         	<option value="3">审核不合格</option>
+                                        </select>
+							                  商品名称：<input id="condition">
+									<button class="btn btn-default" onclick="Condition()">查询</button>
+                                </div>
+                            </div>
+                            <!--工具栏/-->
+
+			                  <!--数据列表-->
+			                  <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+			                      <thead>
+			                          <tr>
+			                              <th class="" style="padding-right:0px">
+			                                  <input id="selall" type="checkbox" class="icheckbox_square-blue" onclick="swapCheck()">
+			                              </th> 
+										  <th class="sorting_asc">商品ID</th>
+									      <th class="sorting">商品名称</th>
+                                          <th class="sorting">商品类型</th>
+										  <th class="sorting">商品品牌</th>
+									      <th class="sorting">商品价格</th>
+										  <th class="sorting">商品描述</th>
+									      <th class="sorting" >状态</th>
+					                      <th class="text-center">操作</th>
+			                          </tr>
+								  <tbody id="tbody"></tbody>
+			                      </thead>
+			                      <tbody>
+			                      </tbody>
+			                  </table>
+			                  <!--数据列表/-->
+                        </div>
+                        <!-- 数据表格 /-->
+                     </div>
+                    <!-- /.box-body -->
+  <div class="contant">
+      <ul id="dataUl">
+      </ul>
+
+      <div class="pageNum">
+          <ul class="pagination">
+              <li><a href="">首页</a></li>
+              <li class="threeword"><a href="#">上一页</a></li>
+              <li><a href="#">1</a></li>
+              <li><a href="#">2</a></li>
+              <li><a href="#">3</a></li>
+              <li><a href="#">4</a></li>
+              <li><a href="#">5</a></li>
+              <li><a href="#">6</a></li>
+              <li><a href="#">7</a></li>
+              <li><a href="#">8</a></li>
+              <li><a href="#">9</a></li>
+              <li><a href="#">10</a></li>
+              <li class="threeword"><a href="javascript:;">下一页</a></li>
+              <li class="threeword"><a href="javascript:;">末页</a></li>
+          </ul>
+      </div>
+  </div>
+  <script>
+      var pageNum=1;
+	  function initPage(pageNum){
+	      var merchantid = window.location.search.split("=")[1];
+		  $.ajax({
+			  type : "POST",
+			  contentType: "application/json;charset=UTF-8",
+			  dataType:"json",
+			  url : "http://localhost:8080//selectAllGoods",
+			  data:JSON.stringify({
+                  "merchantid":merchantid,
+                  "pageNum":pageNum
+              }),
+              success : function(result) {
+			      var pages = result.pages;
+			      $("#dataTable tbody").html("");
+				  $(result.list).each(function(index,item){
+					  console.log(item);
+					  var goodsstatus="";
+					  var status=item.goodsstatus;
+					  if(status==0){
+						  goodsstatus="未审核";
+					  }else if(status==1){
+					      goodsstatus="正在申请";
+                      } else if(status==2){
+						  goodsstatus="审核通过";
+					  }else{
+						  goodsstatus="审核不合格";
+					  }
+
+                      var goodstype="";
+                      var goodstypeid=item.goodstypeid;
+                      if(goodstypeid==1){
+                          goodstype="男装";
+                      }else if(goodstypeid==2){
+                          goodstype="女装";
+                      } else if(goodstypeid==3){
+                          goodstype="鞋靴";
+                      }else if(goodstypeid==4){
+                          goodstype="箱包";
+                      }else if(goodstypeid==5){
+                          goodstype="手机";
+                      }else if(goodstypeid==6){
+                          goodstype="其他";
+                      }
+					  var trStr = "<tr>";
+					  trStr+="<td><input type=\"checkbox\" name='ids'></td>";
+					  trStr+="<td>"+item.goodsid+"</td>";
+					  trStr+="<td>"+item.goodsname+"</td>";
+                      trStr+="<td>"+goodstype+"</td>";
+					  trStr+="<td>"+item.goodsbrand+"</td>";
+					  trStr+="<td>"+item.goodsprice+"</td>";
+					  trStr+="<td>"+item.goodscontent+"</td>";
+					  trStr+="<td>"+goodsstatus+"</td>";
+					  trStr+="<td>";
+					  trStr+="<button type=\"button\" class=\"btn bg-olive btn-xs\" onclick='editgood("+item.goodsid+")'>修改</button>"
+					  trStr+="</td>";
+					  trStr+="</tr>";
+					  $("#dataTable").append(trStr);
+				  });
+                  var splitePageStr ="<li><a onclick='initPage(1)' href='#top'>首页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+result.prePage+" )' href='#top'>上一页</a></li>";
+                  for(var i=1;i<=result.lastPage;i++){
+                      splitePageStr +="<li><a onclick='initPage("+i+")'>"+i+"</a></li>";
+                  }
+                  splitePageStr += "<li class=\"threeword\"><a onclick='initPage("+result.nextPage+" )' href='#top'>下一页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+pages+" )' href='#top'>末页</a></li>";
+                  $(".pagination").html("");
+                  $(".pagination").append(splitePageStr);
+              },
+			  error : function(e){
+				  console.error(e);
+				  console.log(e.status);
+				  console.log(e.responseText);
+			  }
+		  });
+	  }
+	  initPage(pageNum);
+	  function editgood(goodsid) {
+          var merchantid = window.location.search.split("=")[1];
+		  window.location.href="goods_edit.html?sellerid="+merchantid+"&goodsid="+goodsid;
+	  }
+
+	  function Condition(pageNum){
+          var merchantid = window.location.search.split("=")[1];
+          var condition = $("#condition").val();
+		  $.ajax({
+			  type:"POST",
+			  contentType:"application/json;charset=UTF-8",
+			  url:"http://localhost:8080//selectByCondition",
+			  data:JSON.stringify({
+                  "merchantid":merchantid,
+                  "condition":condition,
+                  "pageNum":pageNum
+              }),
+              success:function (result) {
+			      var pages = result.pages;
+                  $("#dataTable tbody").html("");
+                  $(result.list).each(function(index,item){
+                      console.log(item);
+                      var goodsstatus="";
+                      var status=item.goodsstatus;
+                      if(status==0){
+                          goodsstatus="未审核";
+                      }else if(status==1){
+                          goodsstatus="正在申请";
+                      } else if(status==2){
+                          goodsstatus="审核通过";
+                      }else if(status==3){
+                          goodsstatus="审核不合格";
+                      }else{
+                          goodsstatus=item.goodsstatus;
+                      }
+                      var goodstype="";
+                      var goodstypeid=item.goodstypeid;
+                      if(goodstypeid==1){
+                          goodstype="男装";
+                      }else if(goodstypeid==2){
+                          goodstype="女装";
+                      } else if(goodstypeid==3){
+                          goodstype="鞋靴";
+                      }else if(goodstypeid==4){
+                          goodstype="箱包";
+                      }else if(goodstypeid==5){
+                          goodstype="手机";
+                      }else if(goodstypeid==6){
+                          goodstype="其他";
+                      };
+                      var trStr = "<tr>";
+                      trStr+="<td><input type=\"checkbox\" name='ids'></td>";
+                      trStr+="<td>"+item.goodsid+"</td>";
+                      trStr+="<td>"+item.goodsname+"</td>";
+                      trStr+="<td>"+goodstype+"</td>";
+                      trStr+="<td>"+item.goodsbrand+"</td>";
+                      trStr+="<td>"+item.goodsprice+"</td>";
+                      trStr+="<td>"+item.goodscontent+"</td>";
+                      trStr+="<td>"+goodsstatus+"</td>";
+                      trStr+="<td>";
+                      trStr+="<button type=\"button\" class=\"btn bg-olive btn-xs\" onclick='editgood("+item.goodsid+")'>修改</button>"
+                      trStr+="</td>";
+                      trStr+="</tr>";
+                      $("#dataTable").append(trStr);
+                  });
+                  document.getElementById("condition").value="";
+                  var splitePageStr ="<li><a onclick='initPage(1)' href='#top'>首页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+result.prePage+" )' href='#top'>上一页</a></li>";
+                  for(var i=1;i<=result.lastPage;i++){
+                      splitePageStr +="<li><a onclick='initPage("+i+")'>"+i+"</a></li>";
+                  }
+                  splitePageStr += "<li class=\"threeword\"><a onclick='initPage("+result.nextPage+" )' href='#top'>下一页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+pages+" )' href='#top'>末页</a></li>";
+                  $(".pagination").html("");
+                  $(".pagination").append(splitePageStr);
+              },
+              error : function(e){
+              console.error(e)
+              console.log(e.status)
+              console.log(e.responseText)
+          }
+          });
+	  };
+
+	  function addgoods() {
+          var merchantid = window.location.search.split("=")[1];
+		  window.location.href="goods_add.html?merchantid="+merchantid;
+	  };
+
+	  var isCheckAll = false;
+	  function swapCheck() {
+		  if (isCheckAll) {
+			  $("input[type='checkbox']").each(function() {
+				  this.checked = false;
+			  });
+			  isCheckAll = false;
+		  } else {
+			  $("input[type='checkbox']").each(function() {
+				  this.checked = true;
+			  });
+			  isCheckAll = true;
+		  }
+	  };
+
+      function batchDel(){
+          var ids = [];
+          // 获取选中的id
+          $('input:checkbox:checked').parent().next().each(function(idx,element){
+              ids.push($(element).text());
+          });
+          var obj = {"ids":ids};
+          if (window.confirm("您确认要删除选中的内容吗？")){
+              $.ajax({
+                  type: "POST",
+                  url: "http://localhost:8080//deleteSelectedGoods",
+                  data:$.param(obj,true), // 数组序列化
+                  dataType:"json",
+                  success: function(msg){
+                      if(msg.type=="success"){
+                          window.location.reload()
+                      }
+                  },
+                  error: function(msg){
+                      if(msg.type=="error"){
+                          alert("删除失败!");
+                      }
+                  }
+              });
+              return true;
+          }else{
+              alert("请选择您要删除的内容!");
+              return false;
+          }
+      };
+
+      function updatestatus() {
+          var ids = [];
+          // 获取选中的id
+          $('input:checkbox:checked').parent().next().each(function(idx,element){
+              ids.push($(element).text());
+          });
+          var obj = {"ids":ids};
+          if (window.confirm("您确认要提交审核选中的内容吗？")){
+              $.ajax({
+                  type: "POST",
+                  url: "http://localhost:8080//updateGoodsByStatus",
+                  data:$.param(obj,true), // 数组序列化
+                  dataType:"json",
+                  success: function(msg){
+                      if(msg.type=="success"){
+                          window.location.reload()
+                      }
+                  },
+                  error: function(msg){
+                      if(msg.type=="error"){
+                          alert("提交失败!");
+                      }
+                  }
+              });
+              return true;
+          }else{
+              alert("请选择您要删除的内容!");
+              return false;
+          }
+      };
+
+      function selectByType(pageNum) {
+          var options = $("#selOp option:selected");
+          var merchantid = window.location.search.split("=")[1];
+          var val = options.val();
+          $.ajax({
+              type : "POST",
+              contentType: "application/json;charset=UTF-8",
+              dataType:"json",
+              url : "http://localhost:8080//selectByType",
+              data:JSON.stringify({
+                  "merchantid":merchantid,
+                  "goodsstatus":val,
+                  "pageNum":pageNum
+              }),
+              success : function(result) {
+                  var pages = result.pages;
+                  $("#dataTable tbody").html("");
+                  $(result.list).each(function(index,item){
+                      console.log(item);
+                      var goodsstatus="";
+                      var status=item.goodsstatus;
+                      if(status==0){
+                          goodsstatus="未审核";
+                      }else if(status==1){
+                          goodsstatus="正在申请";
+                      } else if(status==2){
+                          goodsstatus="审核通过";
+                      }else if(status==3){
+                          goodsstatus="审核不合格";
+                      }else{
+                          goodsstatus=item.goodsstatus;
+                      }
+                      var goodstype="";
+                      var goodstypeid=item.goodstypeid;
+                      if(goodstypeid==1){
+                          goodstype="男装";
+                      }else if(goodstypeid==2){
+                          goodstype="女装";
+                      } else if(goodstypeid==3){
+                          goodstype="鞋靴";
+                      }else if(goodstypeid==4){
+                          goodstype="箱包";
+                      }else if(goodstypeid==5){
+                          goodstype="手机";
+                      }else if(goodstypeid==6){
+                          goodstype="其他";
+                      };
+                      var trStr = "<tr>";
+                      trStr+="<td><input type=\"checkbox\" name='ids'></td>";
+                      trStr+="<td>"+item.goodsid+"</td>";
+                      trStr+="<td>"+item.goodsname+"</td>";
+                      trStr+="<td>"+goodstype+"</td>";
+                      trStr+="<td>"+item.goodsbrand+"</td>";
+                      trStr+="<td>"+item.goodsprice+"</td>";
+                      trStr+="<td>"+item.goodscontent+"</td>";
+                      trStr+="<td>"+goodsstatus+"</td>";
+                      trStr+="<td>";
+                      trStr+="<button type=\"button\" class=\"btn bg-olive btn-xs\" onclick='editgood("+item.goodsid+")'>修改</button>"
+                      trStr+="</td>";
+                      trStr+="</tr>";
+                      $("#dataTable").append(trStr);
+                  });
+                  var splitePageStr ="<li><a onclick='initPage(1)' href='#top'>首页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+result.prePage+" )' href='#top'>上一页</a></li>";
+                  for(var i=1;i<=result.lastPage;i++){
+                      splitePageStr +="<li><a onclick='initPage("+i+")'>"+i+"</a></li>";
+                  }
+                  splitePageStr += "<li class=\"threeword\"><a onclick='initPage("+result.nextPage+" )' href='#top'>下一页</a></li>";
+                  splitePageStr+="<li class=\"threeword\"><a onclick='initPage("+pages+" )' href='#top'>末页</a></li>";
+                  $(".pagination").html("");
+                  $(".pagination").append(splitePageStr);
+              },
+              error : function(e){
+                  console.error(e)
+                  console.log(e.status)
+                  console.log(e.responseText)
+              }
+          });
+      }
+  </script>
+</body>
+</html>

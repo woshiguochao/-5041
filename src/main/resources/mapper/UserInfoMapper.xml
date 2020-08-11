@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qf.dao.UserInfoMapper">
+
+    <insert id="editUserInfo" parameterType="com.qf.pojo.UserInfo">
+        insert into userinfo(userinfoid,nicname,usersex,userbirthday,userlocation,userjob)
+         values (#{userinfoid},#{nicname},#{usersex},#{userbirthday},#{userlocation},#{userjob})
+    </insert>
+
+    <select id="getUserInfoByUserInfoid" parameterType="int" resultType="com.qf.pojo.UserInfo">
+        select * from userinfo where userinfoid=#{userinfoid}
+    </select>
+
+    <update id="updateUserInfoByUserInfoId" parameterType="com.qf.pojo.UserInfo">
+        update userinfo set nicname = #{nicname},usersex=#{usersex},userbirthday=#{userbirthday},userlocation = #{userlocation},userjob=#{userjob}
+         where userinfoid=#{userinfoid}
+    </update>
+
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qf.dao.shipAddressMapper">
+    <insert id="editAddress" parameterType="com.qf.pojo.shipAddress">
+        insert into shipaddress(shipname,shipphone,province,city,addressdetail,email)
+         values (#{shipname},#{shipphone},#{province},#{city},#{addressdetail},#{email})
+    </insert>
+
+    <select id="getAddressById"  parameterType="int" resultType="com.qf.pojo.shipAddress">
+        select shipname,shipphone,province,city,addressdetail,email from shipaddress where shipaddrid=#{shipaddrid}
+    </select>
+
+    <select id="getAddress"  resultType="com.qf.pojo.shipAddress">
+        select status,shipaddrid,shipname,shipphone,province,city,addressdetail,email from shipaddress
+    </select>
+
+    <update id="deleteAddressById" parameterType="int">
+        DELETE FROM shipaddress WHERE shipaddrid=#{shipaddrid}
+    </update>
+
+    <update id="updateAddressById" parameterType="com.qf.pojo.shipAddress">
+        update shipaddress set shipname = #{shipname},shipphone=#{shipphone},province=#{province},city = #{city},addressdetail=#{addressdetail},email=#{email}
+         where shipaddrid=#{shipaddrid}
+    </update>
+
+    <update id="updateStatus" parameterType="com.qf.pojo.shipAddress">
+        update shipaddress set status = #{status} where shipaddrid=#{shipaddrid}
+    </update>
+</mapper>

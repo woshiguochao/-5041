@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>editGoods</title>
+    <meta charset="GB18030">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/doc.min.css">
+    <style>
+        .tree li {
+            list-style-type: none;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+<form role="form" >
+    <div><a class="navbar-brand" style="font-size:40px;" href="#">修改商品</a></div>
+    <div class="form-group">
+        <label for="goodsName">商品名</label>
+        <input type="text" class="form-control" id="goodsName" placeholder="请输入商品名">
+    </div>
+    <div class="form-group">
+        <label for="goodsTitle">商品标题</label>
+        <input type="text" class="form-control" id="goodsTitle" placeholder="请输入商品标题">
+    </div>
+    <div class="form-group">
+        <label for="basePrice">基础价格</label>
+        <input type="text" class="form-control" id="basePrice" placeholder="请输入基础价格">
+    </div>
+    <div class="form-group">
+        <label for="price">价格</label>
+        <input type="text" class="form-control" id="price" placeholder="请输入价格">
+    </div>
+    <div class="form-group">
+        <label for="stockNum">库存数量</label>
+        <input type="text" class="form-control" id="stockNum" placeholder="请输入库存数量">
+    </div>
+    <div class="form-group">
+        <label for="goodsDesc">商品介绍</label>
+        <input type="text" class="form-control" id="goodsDesc" placeholder="请输入商品介绍">
+    </div>
+    <button type="button" class="btn btn-success" onclick="addGoodsInfo()"><i class="glyphicon glyphicon-plus"></i> 新增</button>
+    <button type="button" class="btn btn-danger" onclick="reset"><i class="glyphicon glyphicon-refresh"></i> 重置</button>
+</form>
+
+
+
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<script src="script/docs.min.js"></script>
+
+<script>
+
+</script>
+</body>
+</html>
